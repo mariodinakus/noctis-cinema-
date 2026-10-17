@@ -1,4 +1,5 @@
-export type Movie = { id:string; title:string; year:number; genre:string[]; minutes:number; overview:string; director:string; decade:number; poster?:string|null; backdrop?:string|null; tmdbId?:number; vote?:number; color?:string; tagline?:string };
+import universe from '@/data/universe.json';
+export type Movie = { imdbId?:string; id:string; title:string; year:number; genre:string[]; minutes:number; overview:string; director:string; decade:number; poster?:string|null; backdrop?:string|null; tmdbId?:number; vote?:number; color?:string; tagline?:string };
 export type FilmEntry = {title:string;year:number;rating?:number;watched?:boolean;watchlist?:boolean};
 export type Profile = {id:'a'|'b';name:string;entries:FilmEntry[];importedAt:number};
 export type Screen = 'tonight'|'discover'|'taste'|'couple'|'watchlist'|'streaming'|'settings';
@@ -62,7 +63,14 @@ const raw: Array<[string,number,number,string,string,string,string,string?]> = [
  ['The Menu',2022,107,'Horror|Thriller|Comedy','Mark Mylod','An exclusive dinner turns into a terrifying theatrical experience.','#7a4b46'],
  ['Poor Things',2023,141,'Science Fiction|Romance|Comedy','Yorgos Lanthimos','A young woman embarks on an extraordinary journey of self-discovery.','#8d6685'],
 ];
-export const CATALOG:Movie[] = raw.map(([title,year,minutes,genre,director,overview,color,tagline],i)=>({id:`curated-${i}`,title,year,minutes,genre:genre.split('|'),director,overview,color,tagline,decade:Math.floor(year/10)*10}));
+const CURATED:Movie[] = raw.map(([title,year,minutes,genre,director,overview,color,tagline],i)=>({id:`curated-${i}`,title,year,minutes,genre:genre.split('|'),director,overview,color,tagline,decade:Math.floor(year/10)*10}));
+// The curated films keep their descriptions and directors; the larger universe supplies genres,
+// runtimes, IMDb scores and posters. Deduplicate by normalized title and release year.
+const catalogByKey=new Map<string,Movie>();
+const movieKey=(m:Movie)=>`${m.title.toLowerCase().normalize('NFKD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]/g,'')}-${m.year}`;
+for(const m of universe as Movie[]) catalogByKey.set(movieKey(m),m);
+for(const m of CURATED){const key=movieKey(m);const candidate=catalogByKey.get(key);catalogByKey.set(key,{...candidate,...m,poster:candidate?.poster||m.poster||null,imdbId:candidate?.imdbId,vote:candidate?.vote||m.vote})}
+export const CATALOG:Movie[]=[...catalogByKey.values()];
 export function keyOf(title:string,year?:number){return `${title.normalize('NFKD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/^the /,'').replace(/[^a-z0-9]+/g,'').trim()}-${year||''}`;}
 export function entryMatch(a:{title:string;year:number},b:{title:string;year:number}) {return keyOf(a.title,a.year)===keyOf(b.title,b.year)|| (Math.abs(a.year-b.year)<=1&&keyOf(a.title).split('-')[0]===keyOf(b.title).split('-')[0]);}
 export function watched(profile:Profile|null,m:Movie){return !!profile?.entries.some(e=>e.watched&&entryMatch(e,m));}

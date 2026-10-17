@@ -30,3 +30,6 @@
 @media(max-width:950px){.artwork-status{display:none}}
 @media(max-width:650px){.cover{height:auto;min-height:0;aspect-ratio:2/3}.modal-cinema-bg{height:215px}.film-modal{display:flex;flex-direction:column}.modal-cover{padding:105px 0 0 19px}.modal-cover .cover{min-height:0;width:130px;height:auto;aspect-ratio:2 / 3}.modal-content,.modal-content.has-backdrop{padding:18px 20px 27px}.modal-content h2{font-size:42px}}
 @media(prefers-reduced-motion:reduce){.poster-skeleton{animation:none}.cover img{transition:none}}
+
+/* Film universe: compact mobile-safe navigation through 2,000 titles */
+.catalog-count{display:flex;align-items:baseline;flex-wrap:wrap;gap:8px;color:#b7aaa9;font-size:13px;padding:18px 0 12px;border-top:1px solid #3c292e;margin-top:8px}.catalog-count strong{font-family:var(--font-serif);font-size:34px;line-height:1;color:#f1e4dd;font-weight:600}.catalog-count span{color:#837477}.load-more-wrap{display:flex;justify-content:center;padding:36px 12px 46px}.load-more-wrap button{min-width:220px;justify-content:center}

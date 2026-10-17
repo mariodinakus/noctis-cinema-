@@ -1,0 +1,33 @@
+name: Refresh film universe
+on:
+  push:
+    paths:
+      - 'scripts/generate-universe.mjs'
+      - '.github/workflows/film-universe.yml'
+  workflow_dispatch:
+  schedule:
+    - cron: '17 5 * * 1'
+permissions:
+  contents: write
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: true
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: '22'
+      - name: Refresh the local movie snapshot
+        run: node scripts/generate-universe.mjs
+      - name: Commit verified metadata if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/data/universe.json
+          if ! git diff --cached --quiet; then
+            git commit -m "Refresh 1,950 movie catalog [skip ci]"
+            git push origin HEAD:main
+          fi

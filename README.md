@@ -3,7 +3,7 @@
 A gothic black/crimson film discovery application, built with Next.js App Router.
 
 ## Features
-- Responsive EN/EL interface, curated offline catalog of 48 films
+- Responsive EN/EL interface, curated offline catalog of 49 films
 - **Real Letterboxd ZIP parsing** in the browser (watched, ratings, diary, watchlist). Private and local-only.
 - Taste DNA breakdown, genre plots and honest coverage/confidence figures
 - Recommendations based on explicit weighted genre/director/decade heuristic, mood and duration
@@ -34,3 +34,11 @@ Letterboxd ZIP archives are parsed client-side with JSZip and PapaParse. They ar
 The demo catalog is hand-curated. Any recommendation score (out of 5) is a heuristic preference estimate, **not** a statistically calibrated rating or trained ML prediction. Imported films outside the curated catalog still contribute to watched counts and exclusion if names match; full cross-catalog feature enrichment would require a larger online dataset. Movie availability is never inferred from poster or catalog. Actual streaming providers are provided by TMDB/JustWatch by title and region, may change, and should be rechecked before watching. TMDB provider link may point to a TMDB-specific providers view.
 
 No association with Letterboxd, TMDB, JustWatch, MUBI, Cinobo, Netflix or Stremio. This application uses the TMDB API but is not endorsed or certified by TMDB. Attribution for watch-provider data is required by TMDB/JustWatch if you enable public commercial service.
+
+## Expanded film universe (up to ~2,000 movies)
+
+The app builds its offline library from a snapshot of the Quantavil [IMDb clean dataset](https://github.com/quantavil/imdb-dataset) (GPL-3.0). We redistribute only film metadata, not poster images. Poster URLs refer to the original image providers; their rights remain with the respective holders. IMDb ratings are historical snapshots, **not** personalized recommendations or streaming availability. We attribute IMDb and the open dataset provider and provide a link to the upstream licensing notice.
+
+`node scripts/generate-universe.mjs` downloads the public gzipped dataset and selects 1,950 high-signal films across seven time periods, removing duplicates. The site combines these with its 49 hand-curated picks. For deployments where snapshot generation failed, the `/api/universe` route tries to load the collection at runtime; it does not claim the enlarged catalog is loaded until it really is. Watch providers still require a TMDB token.
+
+The `Refresh film universe` GitHub Action periodically updates the metadata snapshot. A snapshot is committed into the repository to avoid depending on the provider CDN during ordinary page visits. `npm run build` does not require network access to download the dataset.
