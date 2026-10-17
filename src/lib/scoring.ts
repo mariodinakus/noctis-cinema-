@@ -12,7 +12,7 @@ export function profileSignals(profile:Profile|null,catalog:Movie[]){
  return {genres,directors,decades,matched:matched.length,rated:refs.length,seen:profile?.entries.filter(x=>x.watched).length||0};
 }
 export function recommend(movies:Movie[],a:Profile|null,b:Profile|null,mood:string,duration:number,excludeWatched=true,couple=false,liked:string[]=[],listOnly=false){
- const signalA=profileSignals(a,movies),signalB=profileSignals(b,movies);const moodGenres=MOODS.find(m=>m.id===mood)?.genres||[];
+ const signalA=profileSignals(a,movies),signalB=profileSignals(b,movies);const moodGenres:string[]=[...(MOODS.find(m=>m.id===mood)?.genres||[])];
  const scoreOne=(m:Movie,signal:ReturnType<typeof profileSignals>)=>{
   const genre=m.genre.reduce((s,g)=>{const v=signal.genres.get(g);return s+(v ? v.sum/Math.max(1,Math.sqrt(v.n)):0)},0)/Math.max(1,m.genre.length);
   const director=signal.directors.get(m.director),decade=signal.decades.get(m.decade);
